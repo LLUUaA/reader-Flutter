@@ -67,21 +67,27 @@ class ViewDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     // const cWidth = MediaQuery.of(context).size.width;
     return Container(
-      width:  MediaQuery.of(context).size.width / 3,
+      width: MediaQuery.of(context).size.width / 3,
       // height: MediaQuery.of(context).size.width / 2,
       alignment: Alignment.center,
-      padding: EdgeInsets.all(5),
-      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+      // padding: EdgeInsets.all(5),
+      margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
       color: color,
-      child: Column(
-        children: <Widget>[
-          Image.network('https://image-res.mzres.com/image/flyme-icon/99103bd85a1042ae9365833a55857ca4z',
-          width: MediaQuery.of(context).size.width * 0.26,
-          height: MediaQuery.of(context).size.width * 0.31,
-          fit: BoxFit.cover,
-          ),
-          Text('<<三体>>')
-        ],
+      child: FlatButton(
+        child: Column(
+          children: <Widget>[
+            Image.network(
+              'https://image-res.mzres.com/image/flyme-icon/99103bd85a1042ae9365833a55857ca4z',
+              // width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.width * 0.31,
+              fit: BoxFit.cover,
+            ),
+            Text('${this.content}')
+          ],
+        ),
+        onPressed: () {
+          Navigator.pushNamed(context, '/reader');
+        },
       ),
     );
   }
@@ -109,7 +115,7 @@ class SearchWidget extends StatelessWidget {
           // Navigator.push(context, MaterialPageRoute(builder: (context) {
           //   return AboutWidget();
           // }));
-          Navigator.pushNamed(context, 'about');
+          Navigator.pushNamed(context, '/about');
         },
       ),
     );

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import './home/bookShelf.dart';
-import './home/discover.dart';
-import './home/menu.dart';
+import './bookShelf.dart';
+import './discover.dart';
+import './menu.dart';
 
 class Home extends StatefulWidget {
-  int currentIndex = 0;
+  int currentIndex;
   PageController pageController;
-  Home() {
+  Home({this.currentIndex = 0}) {
     this.pageController = new PageController(initialPage: this.currentIndex);
   }
   _HomeWidget createState() => _HomeWidget();
