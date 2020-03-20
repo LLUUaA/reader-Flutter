@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:device_info/device_info.dart';
 
 class BookShelf extends StatefulWidget {
   @override
@@ -8,6 +9,10 @@ class BookShelf extends StatefulWidget {
 class _BookShelf extends State<BookShelf> with AutomaticKeepAliveClientMixin {
   @override
   bool get wantKeepAlive => true;
+
+  deviceInfo() async {
+    var androidInfo = await DeviceInfoPlugin().androidInfo;
+  }
 
   @override
   Widget build(BuildContext context) {

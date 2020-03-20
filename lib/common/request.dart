@@ -21,7 +21,7 @@ class Request {
   }
 
   Future request({String method = "get", String api, Map query, Map body}) async {
-    var resp;
+    http.Response resp;
     switch (method) {
       case "get":
         String queryStr = this.parseQueryString(query);
@@ -38,7 +38,8 @@ class Request {
       Map body = convert.json.decode(resp.body);
       return body;
     } else {
-      throw Future.error(resp);
+      // throw Exception(resp.body);
+      return Future.error(resp.body);
     }
   }
 

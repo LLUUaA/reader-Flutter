@@ -1,52 +1,34 @@
 import 'package:flutter/material.dart';
 
-import '../service/book.dart' show getChapterList;
-import './loading.dart';
+import './common.dart';
 
-class ChapterList extends StatefulWidget {
+class ChapterList extends StatelessWidget {
+  final List chapterList;
   final int id;
-  final int pageIndex;
-  ChapterList(this.id, {this.pageIndex});
-
-  _ChapterList createState() => _ChapterList(this.id, pageIndex: this.pageIndex);
-}
-
-class _ChapterList extends State<ChapterList> {
-  List chapterList;
-  final int id;
-  final int pageIndex;
-  bool loading = true;
-
-  _ChapterList(this.id, {this.pageIndex}) {
-    this.getChapterListById(this.id, index: this.pageIndex);
-  }
+  final bool isLoading;
+  final bool isEmpty;
+  ChapterList(this.id, this.chapterList, {this.isLoading, this.isEmpty});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: this.loading
-          ? Loading()
-          : Column(
-              children: <Widget>[
-                Column(
-                  children: this.chapterList.map((f) {
-                    return ChapterItem(f["chapterName"], widget.id,
-                        chapterNum: f["chapterNum"]);
-                  }).toList(),
-                ),
-              ],
-            ),
-    );
-  }
-
-  void getChapterListById(int id, {int index}) async {
-    if (id != null) {
-      var res = await getChapterList(id, pageIndex: index);
-      setState(() {
-        this.loading = false;
-        this.chapterList = res["chapterList"].sublist(0, 30);
-      });
+    if(this.isLoading == true) {
+      return Loading();
     }
+
+    if (this.isEmpty == true) {
+      return Empty();
+    }
+    if(this.chapterList == null) {
+      return Empty(content: '',);
+    }
+    return Container(
+      child: Column(
+        children: this.chapterList.map((f) {
+          return ChapterItem(f["chapterName"], this.id,
+              chapterNum: f["chapterNum"]);
+        }).toList(),
+      ),
+    );
   }
 }
 
@@ -75,7 +57,10 @@ class ChapterItem extends StatelessWidget {
           children: <Widget>[
             Align(
               alignment: Alignment.bottomLeft,
-              child: Text(this.chapterName,style: TextStyle(fontSize: 15.0),),
+              child: Text(
+                this.chapterName,
+                style: TextStyle(fontSize: 15.0),
+              ),
             ),
             Divider(height: 10.0, color: Colors.transparent),
             Align(

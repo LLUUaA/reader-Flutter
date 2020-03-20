@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:myapp/service/book.dart' show readBook;
-import '../../widget/loading.dart';
+import '../../widget/common.dart';
 
 class Reader extends StatefulWidget {
   int id;

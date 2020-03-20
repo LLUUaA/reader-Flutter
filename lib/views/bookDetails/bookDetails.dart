@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../widget/chapterList.dart' show ChapterList;
-import '../../service/book.dart' show getBook;
+import '../../service/book.dart' show getBook, getChapterList;
 
 class BookDetails extends StatefulWidget {
   int id;
@@ -19,9 +19,11 @@ class _BookDetails extends State<BookDetails> {
   String catelog;
   String status;
   String coverImg;
+  List chapterList;
   final int id;
   _BookDetails(this.id) {
     this.getBookInfosById(this.id);
+    this.getChapterListSv(this.id);
   }
 
   @override
@@ -83,7 +85,14 @@ class _BookDetails extends State<BookDetails> {
                       });
                     },
                   ),
-                  HandleButton('章节目录'),
+                  HandleButton(
+                    '章节目录',
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/chapterDetails', arguments: {
+                        "id": widget.id,
+                      });
+                    },
+                  ),
                   HandleButton('移出书架'),
                   HandleButton('TXT下载'),
                 ],
@@ -99,7 +108,7 @@ class _BookDetails extends State<BookDetails> {
                   ),
                 ),
               ),
-              ChapterList(widget.id),
+              ChapterList(widget.id, this.chapterList),
               MaterialButton(
                 padding: EdgeInsets.all(8.0),
                 onPressed: () {
@@ -135,6 +144,14 @@ class _BookDetails extends State<BookDetails> {
         this.status = bookInfos["status"];
         this.catelog = bookInfos["chapter"][0];
       } catch (e) {}
+    });
+  }
+
+  // get chapter
+  void getChapterListSv(int id, {int index}) async {
+    var res = await getChapterList(id, pageIndex: index);
+    setState(() {
+      this.chapterList = res["chapterList"];      
     });
   }
 }

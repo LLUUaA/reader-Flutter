@@ -20,13 +20,50 @@ class _MyApp extends State<MyApp> {
       title: '青莲一页',
       routes: <String, WidgetBuilder>{
         '/': (BuildContext context) => Home(),
-        '/reader': (BuildContext context) => Reader(arguments: this.getArgs(context)),
-        '/bookDetails': (BuildContext context) => BookDetails(arguments: this.getArgs(context)),
-        '/chapterDetails': (BuildContext context) =>  ChapterDetails(arguments: this.getArgs(context)),
+        '/load': (BuildContext context) => LoadPage(),
+        '/reader': (BuildContext context) =>
+            Reader(arguments: this.getArgs(context)),
+        '/bookDetails': (BuildContext context) =>
+            BookDetails(arguments: this.getArgs(context)),
+        '/chapterDetails': (BuildContext context) =>
+            ChapterDetails(arguments: this.getArgs(context)),
       },
-      initialRoute: '/',
+      initialRoute: '/load',
       // onGenerateRoute: (setting) {},
       // onUnknownRoute: (setting) {},
+    );
+  }
+}
+
+class LoadPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        // height: ,
+        color: Colors.white,
+        child: Stack(
+          children: <Widget>[
+            Center(
+              child: Text(
+                '青莲一页',
+                style: TextStyle(
+                  color: Colors.blueAccent,
+                  decoration: TextDecoration.none
+                ),
+              ),
+            ),
+            Container(
+              child: Text(
+                'Copyright © 2020-present WuQingSong',
+                style: TextStyle(color: Colors.grey[600], 
+                fontSize: 13.0,
+                 decoration: TextDecoration.none),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 }

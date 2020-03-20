@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './common.dart' show Empty;
 
 class BookItem extends StatelessWidget {
   final int id;
@@ -11,10 +12,9 @@ class BookItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.pushNamed(context, '/bookDetails',
-            arguments: <String, int>{
-              "id": this.id,
-            });
+        Navigator.pushNamed(context, '/bookDetails', arguments: <String, int>{
+          "id": this.id,
+        });
       },
       child: Container(
         height: 130.0,
@@ -79,6 +79,9 @@ class BookList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (this.bookList == null) {
+      return Empty();
+    }
     return Column(
       children: this.bookList.map((item) {
         return BookItem(

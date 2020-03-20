@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:myapp/widget/bookList.dart' show BookList;
 import 'package:myapp/service/book.dart' show getHotBook, getBookByType;
-import '../../widget/loading.dart';
+import '../../widget/common.dart';
 
 class Discover extends StatefulWidget {
   @override
@@ -15,6 +15,7 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
   List femaleMenu;
   bool loading = true; // 加载状态
   double opacity = 0;
+  String chooseMenu;
   ScrollController _controller = new ScrollController();
   List mainMenu = [
     {"type": "hot", "subTxt": "热门"},
@@ -24,6 +25,11 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
   String total;
   _Discover() {
     getBookList();
+    this.handleScroll();
+  }
+
+  // scroll
+  void handleScroll() {
     _controller.addListener(() {
       double op = this._controller.offset / 450.0;
       if (op == 1 || op == 0) {
@@ -83,6 +89,7 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
     }
     setState(() {
       this.loading = true;
+      this.chooseMenu = null;
     });
     switch (type) {
       case "hot":
@@ -132,31 +139,19 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
                     ),
                     new Catelog(this.maleMenu, (item) {
                       this.getBookByTypeSv(item["href"]);
-                      List femaleMenu = this.femaleMenu.map((f) {
-                        if (f["current"] == true) {
-                          f["current"] = false;
-                        }
-                        return f;
-                      }).toList();
                       setState(() {
-                        this.femaleMenu = femaleMenu;
+                        this.chooseMenu = item["href"];
                       });
-                    }),
+                    },chooseMenu: this.chooseMenu),
                     Divider(
                       height: 5.0,
                     ),
                     new Catelog(this.femaleMenu, (item) {
                       this.getBookByTypeSv(item["href"]);
-                      List maleMenu = this.maleMenu.map((f) {
-                        if (f["current"] == true) {
-                          f["current"] = false;
-                        }
-                        return f;
-                      }).toList();
                       setState(() {
-                        this.maleMenu = maleMenu;
+                        this.chooseMenu = item["href"];
                       });
-                    }),
+                    },chooseMenu: this.chooseMenu),
                     Divider(
                       height: 5.0,
                     ),
@@ -209,13 +204,13 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
   // get book lsit
   Future<void> getBookList() async {
     var res = await getHotBook();
-    this.bookList = res["hotBook"];
     List femaleMenu = res["femaleMenu"];
     List maleMenu = res["maleMenu"];
     femaleMenu.insert(0, {"subTxt": "【女频】"});
     maleMenu.insert(0, {"subTxt": "【男频】"});
 
     setState(() {
+      this.bookList = res["hotBook"];
       this.maleMenu = maleMenu;
       this.femaleMenu = femaleMenu;
       this.total = null;
@@ -229,26 +224,18 @@ class _Discover extends State<Discover> with AutomaticKeepAliveClientMixin {
 class Catelog extends StatefulWidget {
   final List menuList;
   final Function chooseCatelog;
-  Catelog(this.menuList, this.chooseCatelog);
+  final String chooseMenu;
+  Catelog(this.menuList, this.chooseCatelog, {this.chooseMenu});
 
   _Catelog createState() => _Catelog();
 }
 
 class _Catelog extends State<Catelog> {
-  Map lastItem;
-
   void handleChoose(item) {
     if (item["href"] == null) {
       return;
     }
     widget.chooseCatelog(item);
-    setState(() {
-      if (this.lastItem != null) {
-        this.lastItem["current"] = false;
-      }
-      item["current"] = true;
-    });
-    this.lastItem = item;
   }
 
   @override
@@ -259,7 +246,7 @@ class _Catelog extends State<Catelog> {
             ? widget.menuList.map((f) {
                 return Container(
                   height: 35.0,
-                  color: f["current"] == true
+                  color: f["href"] != null && f["href"] == widget.chooseMenu
                       ? Color.fromRGBO(251, 188, 5, 1)
                       : Colors.white,
                   child: MaterialButton(
@@ -269,8 +256,9 @@ class _Catelog extends State<Catelog> {
                     child: Text(
                       f["subTxt"] ?? "-",
                       style: TextStyle(
-                        color:
-                            f["current"] == true ? Colors.white : Colors.black,
+                        color: f["href"] != null && f["href"] == widget.chooseMenu
+                            ? Colors.white
+                            : Colors.black,
                         fontSize: 16.0,
                         wordSpacing: 2.0,
                         letterSpacing: 2.0,
@@ -279,7 +267,7 @@ class _Catelog extends State<Catelog> {
                   ),
                 );
               }).toList()
-            : Text('-'),
+            : [Text('-')],
       ),
     );
   }
