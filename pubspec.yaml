@@ -73,4 +73,4 @@ flutter:
   # see https://flutter.dev/custom-fonts/#from-packages
 
   assets:
-    - lib/assets
+    - lib/assets/image/
