@@ -1,41 +1,43 @@
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
-import '../config/index.dart' as config;
+import '../config/index.dart';
+import './global.dart';
 
 class Request {
-  String api;
-  String method;
-  String baseUrl;
-  Map<String, String> headers;
-  Map data;
-  Map query;
+  static String baseUrl;
+  static Map<String, String> headers;
 
-  Request() {
-    this.init();
+  static Future<void> init() {
+    baseUrl = Config.host;
+    return null;
   }
 
-  void init() {
-    this.baseUrl = "http://192.168.0.104:3000";
-    this.headers = {"authorizationHeader": "token"};
-  }
-
-  Future request({String method = "get", String api, Map query, Map body}) async {
+  static Future request(
+      {String method = "get", String api, Map query, body}) async {
     http.Response resp;
+    headers = {"Authorization": "SessionKey ${Global.session ?? ''}"};
+    String url = "$baseUrl/$api";
     switch (method) {
       case "get":
-        String queryStr = this.parseQueryString(query);
-        resp = await http.get("${this.baseUrl}/$api$queryStr", headers: this.headers);
+        String queryStr = parseQueryString(query);
+        resp = await http.get("$url$queryStr", headers: headers);
         break;
       case "post":
-        resp = await http.post(api, headers: this.headers, body: body);
+        resp = await http.post(url,
+            headers: headers, body: convert.json.encode(body ?? null));
         break;
       default:
+        return Future.error("method not support");
         break;
     }
 
+    if (resp.statusCode == 204) {
+      return body;
+    }
+
     if (resp.statusCode == 200) {
-      Map body = convert.json.decode(resp.body);
+      dynamic body = convert.json.decode(resp.body);
       return body;
     } else {
       // throw Exception(resp.body);
@@ -43,12 +45,12 @@ class Request {
     }
   }
 
-  String parseQueryString(Map query) {
+  static String parseQueryString(Map query) {
     String queryStr = "";
     if (query == null) {
       return "";
     }
-    query.forEach((k,v){
+    query.forEach((k, v) {
       queryStr += "$k=$v";
     });
     return "?$queryStr";

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../widget/chapterList.dart' show ChapterList;
-import '../../service/book.dart' show getBook, getChapterList;
+import '../../service/book.dart'
+    show getBook, getChapterList, addBookShelf, removeBookShelf;
+import '../../common/myListen.dart';
 
 class BookDetails extends StatefulWidget {
   int id;
@@ -18,6 +20,7 @@ class _BookDetails extends State<BookDetails> {
   String authorName;
   String catelog;
   String status;
+  bool isAddBookShelf;
   String coverImg;
   List chapterList;
   final int id;
@@ -88,13 +91,22 @@ class _BookDetails extends State<BookDetails> {
                   HandleButton(
                     '章节目录',
                     onPressed: () {
-                      Navigator.pushNamed(context, '/chapterDetails', arguments: {
-                        "id": widget.id,
-                      });
+                      Navigator.pushNamed(context, '/chapterDetails',
+                          arguments: {
+                            "id": widget.id,
+                          });
                     },
                   ),
-                  HandleButton('移出书架'),
-                  HandleButton('TXT下载'),
+                  HandleButton(
+                    isAddBookShelf == null
+                        ? '-'
+                        : isAddBookShelf == true ? '移出书架' : "加入书架",
+                    onPressed: this.handleBookShelfState,
+                  ),
+                  HandleButton(
+                    'TXT下载',
+                    color: Colors.redAccent,
+                  ),
                 ],
               ),
               Container(
@@ -130,17 +142,44 @@ class _BookDetails extends State<BookDetails> {
     );
   }
 
+  void handleBookShelfState() async {
+    assert(this.isAddBookShelf != null);
+
+    if (this.isAddBookShelf == null) {
+      return null;
+    }
+    // change add Bookshelf state
+    setState(() {
+      this.isAddBookShelf = this.isAddBookShelf == true ? false : true;
+    });
+    // 上面先更新了isAddBookShelf 判断时注意
+    if (this.isAddBookShelf == true) {
+      await addBookShelf(widget.id, {
+        "bookId": widget.id,
+        "bookName": this.bookName,
+        "coverImg": this.coverImg,
+        "bookAuthor": this.authorName,
+        "status": this.status,
+      });
+    } else {
+      await removeBookShelf(widget.id);
+    }
+    MyListener.emit(MyEvent.addBookShelf, this.isAddBookShelf);
+  }
+
   // get bookInfo
   Future getBookInfosById(int id) async {
     if (id == null) {
       return;
     }
-    var bookInfos = await getBook(id);
+    var resp = await getBook(id);
+    var bookInfos = resp["bookInfo"];
     setState(() {
       try {
         this.bookName = bookInfos["bookName"];
         this.authorName = bookInfos["bookAuthor"];
         this.coverImg = bookInfos["coverImg"];
+        this.isAddBookShelf = resp["isAddBookShelf"];
         this.status = bookInfos["status"];
         this.catelog = bookInfos["chapter"][0];
       } catch (e) {}
@@ -151,7 +190,7 @@ class _BookDetails extends State<BookDetails> {
   void getChapterListSv(int id, {int index}) async {
     var res = await getChapterList(id, pageIndex: index);
     setState(() {
-      this.chapterList = res["chapterList"];      
+      this.chapterList = res["chapterList"];
     });
   }
 }

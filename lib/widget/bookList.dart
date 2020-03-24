@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import './common.dart' show Empty;
+import './common.dart' show Empty, Loading;
+import './image.dart';
 
 class BookItem extends StatelessWidget {
   final int id;
@@ -29,13 +30,7 @@ class BookItem extends StatelessWidget {
             Container(
               width: 90.0,
               height: 110.0,
-              alignment: Alignment.center,
-              color: Colors.grey[300],
-              child: Image.network(
-                this.coverImgSrc,
-                fit: BoxFit.cover,
-                alignment: Alignment.center,
-              ),
+              child: ImageLoad(this.coverImgSrc, fit: BoxFit.cover),
             ),
             Container(
               width: MediaQuery.of(context).size.width - 110.0,
@@ -75,13 +70,36 @@ class BookItem extends StatelessWidget {
 
 class BookList extends StatelessWidget {
   final List bookList;
-  BookList(this.bookList);
+  final bool isLoading;
+  final bool isEmpty;
+  final String defaultString;
+  final String noDataString;
+  BookList(
+    this.bookList, {
+    this.isLoading,
+    this.isEmpty,
+    this.defaultString,
+    this.noDataString,
+  });
 
   @override
   Widget build(BuildContext context) {
-    if (this.bookList == null) {
-      return Empty();
+    if (this.isLoading == true) {
+      return Loading();
     }
+
+    if (this.bookList == null) {
+      return Empty(
+        content: this.defaultString,
+      );
+    }
+
+    if (this.isEmpty == true || this.bookList.isEmpty) {
+      return Empty(
+        content: this.noDataString,
+      );
+    }
+
     return Column(
       children: this.bookList.map((item) {
         return BookItem(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import './bookShelf.dart';
-import './discover.dart';
-import './menu.dart';
+import './bookShelf.dart' show BookShelf;
+import './discover.dart' show Discover;
+
+// import './menu.dart' show Menu;
 
 class Home extends StatefulWidget {
   int currentIndex;
@@ -22,11 +23,6 @@ class _HomeWidget extends State<Home> {
         onTap: (int index) {
           /// jump to
           widget.pageController.jumpToPage(index);
-          // widget.pageController.animateToPage(
-          //   index,
-          //   duration: Duration(milliseconds: 300),
-          //   curve: Curves.ease,
-          // );
         },
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -37,10 +33,10 @@ class _HomeWidget extends State<Home> {
             icon: Icon(Icons.library_books),
             title: Text('Book'),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu),
-            title: Text('Menu'),
-          ),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.menu),
+          //   title: Text('Menu'),
+          // ),
         ],
       ),
       body: SafeArea(
@@ -54,26 +50,11 @@ class _HomeWidget extends State<Home> {
             });
           },
           children: <Widget>[
-            BookShelf(),
+            BookShelf(widget.pageController),
             Discover(),
-            Menu(),
+            // Menu(),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class ViewDemo extends StatelessWidget {
-  final String content;
-  final Color color;
-  ViewDemo(this.content, this.color);
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: color,
-      child: Center(
-        child: Text(content),
       ),
     );
   }
