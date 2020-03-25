@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common/myColors.dart';
 
 class Loading extends StatelessWidget {
   final double height;
@@ -40,63 +41,79 @@ class Empty extends StatelessWidget {
 }
 
 class ModalSheet extends StatelessWidget {
-  ModalSheet(this.items, {this.onPressed});
+  ModalSheet(this.items,
+      {this.onPressed, this.onCancel, this.showCancel = true});
 
   final List items;
+  final bool showCancel;
   final Function onPressed;
+  final Function onCancel;
+  static const double boxH = 55.0;
+  static const double dividerH = 6.0;
+  static const double cancelH = boxH + dividerH;
 
   @override
   Widget build(BuildContext context) {
-    if (this.items == null || this.items.isEmpty == true) {
+    if (items == null || items.isEmpty == true) {
       return Empty();
     }
-    return ListView.builder(
-      padding: EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
-      itemCount: this.items.length,
-      itemBuilder: (BuildContext context, int index) {
-        return Container(
-          decoration: BoxDecoration(
-              border: Border(
-                  bottom: BorderSide(width: 0.5, color: Colors.black12))),
-          child: MaterialButton(
-            onPressed: () => this.onPressed(index),
-            padding: EdgeInsets.all(15.0),
-            child: Column(
-              children: <Widget>[
-                Text(
-                  this.items[index],
-                  style: TextStyle(fontSize: 15.0),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
 
-    // return ListView(
-    //   padding: EdgeInsets.fromLTRB(20.0,0,20.0,0),
-    //   children: this.items.map((item) {
-    //     return Container(
-    //       decoration: BoxDecoration(
-    //         border: Border(
-    //           bottom: BorderSide(width: 0.5, color: Colors.black12)
-    //         )
-    //       ),
-    //       child: MaterialButton(
-    //         onPressed: () {},
-    //         padding: EdgeInsets.all(15.0),
-    //         child: Column(
-    //           children: <Widget>[
-    //             Text(
-    //               item,
-    //               style: TextStyle(fontSize: 15.0),
-    //             ),
-    //           ],
-    //         ),
-    //       ),
-    //     );
-    //   }).toList(),
-    // );
+    List<Widget> _widgets = [];
+    // content
+    for (var i = 0; i < items.length; i++) {
+      _widgets.add(getItemView(
+        items[i],
+        onPressed: () => this.onPressHandle(context, i),
+      ));
+    }
+
+    if (showCancel) {
+      _widgets.add(Divider(
+        height: dividerH,
+        thickness: dividerH,
+        color: MyColors.hexToRgba("#eee"),
+      ));
+      _widgets.add(getItemView(
+        "取消",
+        onPressed: () => this.onPressHandle(context, -1),
+      ));
+    }
+
+    return Container(
+      height: boxH * this.items.length + (showCancel ? cancelH : 0),
+      child: ListView(
+        scrollDirection: Axis.vertical,
+        children: _widgets,
+      ),
+    );
+  }
+
+  void onPressHandle(BuildContext context, int index) {
+    Navigator.of(context).pop(); // close modal
+    if (index == -1 && onCancel != null) {
+      onCancel();
+    } else if (index > -1 && onPressed != null) {
+      onPressed(index);
+    }
+  }
+
+  Widget getItemView(String item, {Function onPressed}) {
+    return MaterialButton(
+      onPressed: onPressed,
+      padding: EdgeInsets.zero,
+      child: Container(
+        // width: MediaQuery.of(context).size.width,
+        height: boxH,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(width: 0.5, color: Colors.black12)),
+        ),
+        child: Text(
+          item,
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 15.0),
+        ),
+      ),
+    );
   }
 }

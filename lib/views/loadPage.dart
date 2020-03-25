@@ -9,7 +9,7 @@ class LoadPage extends StatefulWidget {
 }
 
 class _LoadPage extends State<LoadPage> {
-  bool showJumpButton;
+  bool showJumpButton = false;
 
   @override
   void initState() {
@@ -70,7 +70,7 @@ class _LoadPage extends State<LoadPage> {
                   '青莲一页',
                   style: TextStyle(
                       color: Colors.blueAccent,
-                      fontSize: 22.0,
+                      fontSize: 20.0,
                       fontWeight: FontWeight.bold,
                       decoration: TextDecoration.none),
                 ),
@@ -85,12 +85,12 @@ class _LoadPage extends State<LoadPage> {
                   'Copyright © 2019-present WuQingSong',
                   style: TextStyle(
                       color: Colors.grey[600],
-                      fontSize: 13.0,
+                      fontSize: 11.0,
                       decoration: TextDecoration.none),
                 ),
               ),
             ),
-            this.showJumpButton == true
+            this.showJumpButton
                 ? Positioned(
                     bottom: 60.0,
                     right: 5.0,
@@ -114,7 +114,7 @@ class CountDown extends StatefulWidget {
 }
 
 class _CountDown extends State<CountDown> {
-  bool _lock;
+  bool _lock = false;
   @override
   void initState() {
     super.initState();
@@ -129,11 +129,11 @@ class _CountDown extends State<CountDown> {
 
   // to home
   void jumpTo() {
-    if (this._lock == true) {
+    if (this._lock) {
       return;
     }
     this._lock = true;
-    Navigator.of(context).popAndPushNamed('/');
+    Navigator.of(context).popAndPushNamed('/home');
   }
 
   @override

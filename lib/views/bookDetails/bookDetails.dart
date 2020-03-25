@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:myapp/widget/toast.dart';
 
 import '../../widget/chapterList.dart' show ChapterList;
 import '../../service/book.dart'
     show getBook, getChapterList, addBookShelf, removeBookShelf;
 import '../../common/myListen.dart';
+// import '';
 
 class BookDetails extends StatefulWidget {
   int id;
@@ -33,13 +35,7 @@ class _BookDetails extends State<BookDetails> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        iconTheme: IconThemeData(color: Colors.black),
-        title: Text(
-          this.name ?? '详情',
-          style:
-              TextStyle(color: Colors.black, decorationColor: Colors.redAccent),
-        ),
-        backgroundColor: Colors.white,
+        title: Text(this.name ?? '详情'),
       ),
       body: SafeArea(
         child: Container(
@@ -106,6 +102,7 @@ class _BookDetails extends State<BookDetails> {
                   HandleButton(
                     'TXT下载',
                     color: Colors.redAccent,
+                    onPressed: () => Toast.toast(context, msg: '暂不支持'),
                   ),
                 ],
               ),
@@ -153,7 +150,7 @@ class _BookDetails extends State<BookDetails> {
       this.isAddBookShelf = this.isAddBookShelf == true ? false : true;
     });
     // 上面先更新了isAddBookShelf 判断时注意
-    if (this.isAddBookShelf == true) {
+    if (this.isAddBookShelf) {
       await addBookShelf(widget.id, {
         "bookId": widget.id,
         "bookName": this.bookName,

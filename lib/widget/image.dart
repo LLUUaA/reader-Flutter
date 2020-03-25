@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 
 class ImageLoad extends StatefulWidget {
   ImageLoad(this.src,
@@ -23,17 +22,23 @@ class _ImageLoad extends State<ImageLoad> {
   Widget _widget;
   static const int MAX_LOAD_TIMES = 1;
   int errTimes = 0;
+  String lastSrc;
 
   @override
   void initState() {
     super.initState();
-    load();
+    // load(); @p1
   }
 
   // TODO: add load image state
 
   @override
   Widget build(BuildContext context) {
+    // fix src changed but image not update
+    if(lastSrc != widget.src) {
+      lastSrc = widget.src;
+      this.load(); // =>p1
+    }
     return _widget ??
         Container(
           width: widget.width,

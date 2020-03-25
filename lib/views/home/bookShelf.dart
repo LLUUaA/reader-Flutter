@@ -2,10 +2,10 @@ import 'dart:math' show pi;
 import 'package:flutter/material.dart';
 
 import 'package:myapp/widget/common.dart';
-import '../../service/account.dart' show login;
 import '../../widget/image.dart';
-import '../../service/book.dart' show getBookShelf;
+import '../../service/book.dart' show getBookShelf, removeBookShelf;
 import '../../common/myListen.dart';
+import '../../widget/willPopScope.dart';
 
 class BookShelf extends StatefulWidget {
   BookShelf(this.pageController);
@@ -65,6 +65,7 @@ class _BookShelf extends State<BookShelf> with AutomaticKeepAliveClientMixin {
           bookId: book["bookId"],
           chapterNum: book["chapterNum"] ?? 1,
           coverImg: book["coverImg"],
+          onLongPress: () => this.showBookAction(book["bookId"]),
         ));
       });
       bookWidgets.add(AddWrap(boxW, boxH, () {
@@ -76,20 +77,22 @@ class _BookShelf extends State<BookShelf> with AutomaticKeepAliveClientMixin {
 
     return Scaffold(
       body: SafeArea(
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.all(5.0), // p1
-          child: Column(
-            children: <Widget>[
-              SearchWidget(),
-              Container(
-                height: MediaQuery.of(context).size.height - 140.0,
-                alignment: Alignment.topLeft,
-                child: SingleChildScrollView(
-                  child: Wrap(children: bookWidgets),
+        child: MyWillPopScope(
+          child: Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(5.0), // p1
+            child: Column(
+              children: <Widget>[
+                SearchWidget(),
+                Container(
+                  height: MediaQuery.of(context).size.height - 140.0,
+                  alignment: Alignment.topLeft,
+                  child: SingleChildScrollView(
+                    child: Wrap(children: bookWidgets),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -98,6 +101,35 @@ class _BookShelf extends State<BookShelf> with AutomaticKeepAliveClientMixin {
 
   void _init() async {
     this.getBookShelfSv();
+  }
+
+  Future<void> showBookAction(int bookId) async {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return new ModalSheet(['移出书架', '查看详情'], onPressed: (int index) {
+            switch (index) {
+              case 0:
+                removeBookShelf(bookId);
+                int index;
+                for (var i = 0; i < bookShelfList.length; i++) {
+                  if (bookShelfList[i]["bookId"] == bookId) {
+                    index = i;
+                    break;
+                  }
+                }
+                setState(() {
+                  this.bookShelfList.removeAt(index);
+                });
+                break;
+              case 1:
+                Navigator.of(context)
+                    .pushNamed('/bookDetails', arguments: {"id": bookId});
+                break;
+              default:
+            }
+          });
+        });
   }
 
   Future<void> getBookShelfSv() async {
@@ -152,15 +184,15 @@ class AddWrap extends StatelessWidget {
 }
 
 class BookShelfView extends StatelessWidget {
-  BookShelfView({
-    this.color,
-    @required this.content,
-    @required this.width,
-    @required this.height,
-    @required this.bookId,
-    @required this.chapterNum,
-    @required this.coverImg,
-  });
+  BookShelfView(
+      {this.color,
+      @required this.content,
+      @required this.width,
+      @required this.height,
+      @required this.bookId,
+      @required this.chapterNum,
+      @required this.coverImg,
+      this.onLongPress});
 
   final Color color;
   final String content;
@@ -169,6 +201,7 @@ class BookShelfView extends StatelessWidget {
   final int bookId;
   final num chapterNum;
   final String coverImg;
+  final Function onLongPress;
 
   //
 
@@ -184,6 +217,7 @@ class BookShelfView extends StatelessWidget {
           Navigator.pushNamed(context, '/reader',
               arguments: {"id": this.bookId, chapterNum: this.chapterNum});
         },
+        onLongPress: this.onLongPress,
         child: Stack(
           children: <Widget>[
             Positioned(

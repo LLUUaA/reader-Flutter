@@ -74,7 +74,7 @@ class _ChapterDetails extends State<ChapterDetails> {
           });
           this.getChapterListSv(this.id, index: this.currentPage - 1);
         } else {
-            Toast.toast(context, msg: '这已经是第一页了');
+          Toast.toast(context, msg: '这已经是第一页了');
         }
         break;
       case "page":
@@ -85,7 +85,6 @@ class _ChapterDetails extends State<ChapterDetails> {
                 setState(() {
                   this.loading = true;
                 });
-                Navigator.of(context).pop(); // close modal
                 this.getChapterListSv(this.id, index: index + 1);
               });
             });
